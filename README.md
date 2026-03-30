@@ -1,32 +1,32 @@
-# Calculadora Simples
+# Simple Calculator
 
-Uma calculadora simples desenvolvida com **React via CDN** e **Tailwind CSS via CDN**, ideal para estudos, projetos básicos e demonstração de interface web sem necessidade de build ou configuração complexa.
+A simple calculator built using **React via CDN** and **Tailwind CSS via CDN**, ideal for learning purposes, basic projects, and demonstrating a web interface without the need for build tools or complex setup.
 
-## Tecnologias utilizadas
+## Technologies Used
 
 - **React** via CDN
 - **ReactDOM** via CDN
 - **Babel Standalone** via CDN
 - **Tailwind CSS** via CDN
-- **HTML, CSS e JavaScript**
+- **HTML, CSS, and JavaScript**
 
-## Objetivo do projeto
+## Project Goal
 
-Este projeto foi criado com o objetivo de demonstrar como construir uma calculadora funcional utilizando React de forma simples, diretamente no navegador, sem precisar de ferramentas como Vite, Webpack ou Node.js.
+This project was created to demonstrate how to build a functional calculator using React in a simple way, directly in the browser, without requiring tools like Vite, Webpack, or Node.js.
 
-## Funcionalidades
+## Features
 
-- Exibição dos números no visor
-- Operações básicas:
-  - adição
-  - subtração
-  - multiplicação
-  - divisão
-- Botão para limpar o visor
-- Cálculo do resultado
-- Interface estilizada com Tailwind CSS
+- Display numbers on the screen
+- Basic operations:
+  - addition
+  - subtraction
+  - multiplication
+  - division
+- Clear button
+- Result calculation
+- Styled interface using Tailwind CSS
 
-## Estrutura do projeto
+## Project Structure
 
 ```bash
 .
