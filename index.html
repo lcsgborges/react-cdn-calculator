@@ -84,7 +84,7 @@
 
             React.useEffect(() => {
                 const savedHistoryLocalStorage = localStorage.getItem(historyKey);
-                setSavedHistory(JSON.parse(savedHistoryLocalStorage) || '[]');
+                setSavedHistory(JSON.parse(savedHistoryLocalStorage || '[]') );
             }, []);
 
             function updateHistory(operation, parsedResult) {
