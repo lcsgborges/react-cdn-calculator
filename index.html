@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <title>Calculadora</title>
+
+    <style type="text/tailwindcss">
+        @theme {
+        --text: #EBEBEB;
+        --text-secondary: #6B6B6B;
+        --primary: #482878;
+        --background: #2D2A37;
+            
+        --gradient: 180deg, 
+            rgba(0, 0, 0, 0.05) 0%, 
+            rgba(255, 255, 255, 0.05) 100%;
+
+        --gradient-hover: 180deg, 
+            rgba(0, 0, 0, 0.1) 0%, 
+            rgba(255, 255, 255, 0.1) 100%;
+ 
+        --shadow: 0px 11px 7px 0px rgba(0, 0, 0, 0.01), 
+            0px 7px 7px 0px rgba(0, 0, 0, 0.04), 
+            0px 4px 6px 0px rgba(0, 0, 0, 0.10), 
+            0px 2px 4px 0px rgba(0, 0, 0, 0.26), 
+            0px 0px 2px 0px rgba(0, 0, 0, 0.29), 
+            0px 2px 3px 0px rgba(255, 255, 255, 0.06) inset;
+ 
+        --font-sans: 'Rubik', sans-serif;
+        }
+    </style>
+</head>
+<body class="text-(--text) font-(--font-sans) bg-violet-200 flex items-center justify-center h-screen w-screen">
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        
+        const textVariants = {
+            default: 'text-xl',
+            muted: 'text-xl text-(--text-secondary)',
+            heading: 'text-2xl',
+            blast: 'text-3xl'
+        }
+
+        const buttonVariants = {
+            default: 'bg-(--background)',
+            primary: 'bg-(--primary)'
+        }
+        
+        const buttons = [
+            {input: 'CE'},
+            {input: 'C', className: 'col-span-2'},
+            {input: '/', variant: 'primary'},
+            {input: '7'}, {input: '8'}, {input: '9'},
+            {input: 'x', variant: 'primary'},
+            {input: '4'}, {input: '5'}, {input: '6'},
+            {input: '-', variant: 'primary'},
+            {input: '1'}, {input: '2'}, {input: '3'},
+            {input: '+', variant: 'primary'},
+            {input: '0', className: 'col-span-2'},
+            {input: '.'},
+            {input: '=', variant: 'primary'}
+        ]
+
+        const HistoryCalculatorContext = React.createContext();
+
+        function HistoryCalculatorProvider({children}) {
+
+            const [savedHistory, setSavedHistory] = React.useState([]);
+
+            const historyKey = 'history';
+
+            React.useEffect(() => {
+                const savedHistoryLocalStorage = localStorage.getItem(historyKey);
+                setSavedHistory(JSON.parse(savedHistoryLocalStorage) || '[]');
+            }, []);
+
+            function updateHistory(operation, parsedResult) {
+                setSavedHistory((prev) => {
+                    const updatedHistoryList = [`${operation} = ${parsedResult}`, ...prev];
+                    localStorage.setItem(historyKey, JSON.stringify(updatedHistoryList))
+                    return updatedHistoryList;
+                })
+            }
+
+            return (
+                <HistoryCalculatorContext.Provider value={{savedHistory, updateHistory}}>
+                    {children}
+                </HistoryCalculatorContext.Provider>
+            )
+        }
+
+        function Text({tag='span', variant='default', className, children, ...props}) {
+            return React.createElement(
+                tag, 
+                {className: `${textVariants[variant]} ${className ?? ''}`,...props}, 
+                children
+            )
+        }
+
+        function Button({children, className, variant='default', ...props}) {
+            return <Text tag='button' variant='heading' className={
+                `flex items-center justify-center rounded-xl p-3 cursor-pointer text-(--text) bg-linear-(--gradient) hover:bg-linear-(--gradient-hover) shadow-(--shadow) h-16 ${className ?? ''} ${buttonVariants[variant]}`
+            } {...props}>{children}</Text>
+        }
+
+        function Card({children, className, variant='default', ...props}) {
+            return (
+                <div className={`bg-(--background) shadow-(--shadow) rounded-2xl ${className ?? ''}`}>
+                    {children}
+                </div>
+            )
+        }
+
+        function CalculatorDisplay({operation, result}) {
+            return (
+                <div className={`flex flex-col gap-2 px-5 cursor-default select-none`}>
+                        <Text 
+                        tag='div' 
+                        variant='muted'
+                        className='flex items-center justify-end h-4'
+                        >{result && operation}</Text>
+
+                        <div className='flex items-center justify-between h-10'>
+                             <Text 
+                        tag='div' 
+                        variant='muted'
+                        >=</Text>
+
+                         <Text 
+                        tag='div' 
+                        variant='blast'
+                        
+                        >{result || operation}</Text>
+                        </div>
+
+                    </div>
+            )
+        }
+
+        function OperationHistory() {
+
+            const {savedHistory} = React.useContext(HistoryCalculatorContext);
+            
+            return (
+                <div className='flex flex-col bg-(--background) w-[22.25rem] rounded-xl p-8 gap-2'>
+                   <Text tag='h2' variant='heading' className='mb-4'>Histórico de operações</Text>
+
+                   {savedHistory.length > 0 ?
+                    <ul>
+                        {savedHistory.map((value, index) => (
+                            <li key={`${index}:${value}`} className='pb-2 text-base'>{value}</li>
+                        ))}
+                    </ul> : 
+                    <Text tag='p' className='text-[16px]' variant='muted' >Nenhuma operação no histórico</Text>
+                   }
+                </div>
+            )
+        }
+
+        function useCalculator() { // custom hook
+            const [operation, setOperation] = React.useState('');
+            const [result, setResult] = React.useState('');
+            const {updateHistory} = React.useContext(HistoryCalculatorContext);
+
+            function doOperation(input) {
+                if (input === 'C') {
+                    setOperation('')
+                    setResult('')
+                    return;
+                }
+
+                if (input === 'CE') {
+                    setResult('')
+                    setOperation(operation.slice(0, -2))
+                    return;
+                }
+
+                if (result) {
+                    setOperation(isNaN(input) ? `${result} ${input}` : input)
+                    setResult('');
+                    return;
+                }
+                
+                if (input === '.') {
+                    setOperation(`${operation}.`)
+                    return;
+                }
+                
+                if (input === '=') {
+                    const operationResult = eval(operation.replaceAll('x', '*'));
+                    setResult(operationResult)
+                    updateHistory(operation, operationResult);
+                    return;
+                }
+                    setOperation(`${operation}${input}`)
+            }
+
+            return {
+                operation, result, doOperation
+            }
+        }
+
+        function Calculator() {
+            const {operation, result, doOperation} = useCalculator();
+
+            const handleButtonClick = (input) => {
+                doOperation(input)
+            }
+
+            return (      
+                <Card className='flex flex-col gap-6 w-[22.25rem] px-8 pt-14 pb-8 h-full'>
+                    <CalculatorDisplay 
+                        operation={operation} 
+                        result={result}
+                    />
+                    <div className='grid grid-cols-4 gap-2'>
+                        {buttons.map((value, index) => (
+                            <Button 
+                                key={`${index}:${value.input}`} 
+                                className={value.className ?? ""} 
+                                variant={value.variant ?? ""}
+                                onClick={() => handleButtonClick(value.input)}
+                            >
+                                {value.input}
+                            </Button>
+                        ))}
+                    </div>
+                </Card>
+            )
+        }
+
+        function App() {
+            return (
+                <main className='py-28 px-4 flex flex-col lg:flex-row gap-2 items-center lg:items-stretch'>
+                    <HistoryCalculatorProvider>
+                        <Calculator/>
+                        <OperationHistory/>
+                    </HistoryCalculatorProvider>
+                </main>
+            )
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(
+            <App/>
+        )
+        
+    </script>
+</body>
+</html>
